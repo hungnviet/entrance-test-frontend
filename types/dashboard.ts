@@ -31,3 +31,10 @@ export interface DashboardData {
   people: dateRecord[];
   companies: dateRecord[];
 }
+
+export interface Contact { 
+    name: string; 
+    icon: string; 
+    type: "person" | "company";
+    visits: number;
+}
