@@ -26,10 +26,8 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 
-interface DateRange {
-  startDate: Date;
-  endDate: Date;
-}
+import { SampleData } from "@/data/sampleData";
+import { DateRange } from "@/types/dashboard";
 
 
 
@@ -511,71 +509,3 @@ function LeadGenerationChart({
 
 
 
-const SampleData = {
-  people: [
-    { date: '2025-04-15', quantity: 83 },
-    { date: '2025-04-16', quantity: 100 },
-    { date: '2025-04-17', quantity: 16 },
-    { date: '2025-04-18', quantity: 53 },
-    { date: '2025-04-19', quantity: 46 },
-    { date: '2025-04-20', quantity: 95 },
-    { date: '2025-04-21', quantity: 23 },
-    { date: '2025-04-22', quantity: 23 },
-    { date: '2025-04-23', quantity: 19 },
-    { date: '2025-04-24', quantity: 43 },
-    { date: '2025-04-25', quantity: 48 },
-    { date: '2025-04-26', quantity: 93 },
-    { date: '2025-04-27', quantity: 57 },
-    { date: '2025-04-28', quantity: 81 },
-    { date: '2025-04-29', quantity: 10 },
-    { date: '2025-04-30', quantity: 92 },
-    { date: '2025-05-01', quantity: 22 },
-    { date: '2025-05-02', quantity: 17 },
-    { date: '2025-05-03', quantity: 63 },
-    { date: '2025-05-04', quantity: 97 },
-    { date: '2025-05-05', quantity: 62 },
-    { date: '2025-05-06', quantity: 22 },
-    { date: '2025-05-07', quantity: 53 },
-    { date: '2025-05-08', quantity: 4 },
-    { date: '2025-05-09', quantity: 59 },
-    { date: '2025-05-10', quantity: 36 },
-    { date: '2025-05-11', quantity: 74 },
-    { date: '2025-05-12', quantity: 70 },
-    { date: '2025-05-13', quantity: 90 },
-    { date: '2025-05-14', quantity: 46 },
-    { date: '2025-05-15', quantity: 1 }
-  ],
-  companies: [
-    { date: '2025-04-15', quantity: 42 },
-    { date: '2025-04-16', quantity: 46 },
-    { date: '2025-04-17', quantity: 20 },
-    { date: '2025-04-18', quantity: 63 },
-    { date: '2025-04-19', quantity: 10 },
-    { date: '2025-04-20', quantity: 29 },
-    { date: '2025-04-21', quantity: 6 },
-    { date: '2025-04-22', quantity: 7 },
-    { date: '2025-04-23', quantity: 62 },
-    { date: '2025-04-24', quantity: 97 },
-    { date: '2025-04-25', quantity: 65 },
-    { date: '2025-04-26', quantity: 96 },
-    { date: '2025-04-27', quantity: 69 },
-    { date: '2025-04-28', quantity: 23 },
-    { date: '2025-04-29', quantity: 36 },
-    { date: '2025-04-30', quantity: 13 },
-    { date: '2025-05-01', quantity: 47 },
-    { date: '2025-05-02', quantity: 78 },
-    { date: '2025-05-03', quantity: 54 },
-    { date: '2025-05-04', quantity: 4 },
-    { date: '2025-05-05', quantity: 92 },
-    { date: '2025-05-06', quantity: 39 },
-    { date: '2025-05-07', quantity: 77 },
-    { date: '2025-05-08', quantity: 66 },
-    { date: '2025-05-09', quantity: 80 },
-    { date: '2025-05-10', quantity: 29 },
-    { date: '2025-05-11', quantity: 49 },
-    { date: '2025-05-12', quantity: 91 },
-    { date: '2025-05-13', quantity: 22 },
-    { date: '2025-05-14', quantity: 76 },
-    { date: '2025-05-15', quantity: 11 }
-  ]
-};
