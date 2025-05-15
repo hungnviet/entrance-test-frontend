@@ -12,6 +12,8 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import AddIcon from '@mui/icons-material/Add';
 import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
 
+import { LogoutButton } from "./LogoutButton";
+
 
 export default function DashboardSideBar(){
     const pathname = usePathname();
@@ -74,6 +76,7 @@ export default function DashboardSideBar(){
                     <PublicOutlinedIcon sx={{ fontSize: 16 }} className="mr-2" />
                     Feedback
                 </button>
+                <LogoutButton/>
                 <div className="flex items-center gap-3 py-2">
                     <div className="h-8 w-8 rounded-full bg-teal-500 flex items-center justify-center text-white font-medium">
                     H

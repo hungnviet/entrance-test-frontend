@@ -1,5 +1,6 @@
 'use client'
-import { useState } from "react";
+import { useState ,useEffect} from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,11 +13,81 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-
 import { HomeButton } from "@/components/page/HomeButton";
+
+import { signinUser } from "@/lib/api/auth";
+
+import {ApiResponse,SigninResponseData } from "@/types/dashboard";
+
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
+
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  
+  const [credentials, setCredentials] = useState({
+    email: "",
+    password: ""
+  });
+
+  useEffect(() => {
+    const checkAuthentication = () => {
+      try {
+        const token = localStorage.getItem("authToken");
+        const userString = localStorage.getItem("user");
+        
+        if (token && userString) {
+          const userData = JSON.parse(userString);
+          if (userData && userData.id && userData.email) {
+            router.push("/dashboard/homepage");
+          }
+        }
+      } catch (error) {
+        console.error("Auth verification error:", error);
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("user");
+      }
+    };
+    
+    checkAuthentication();
+  }, [router]);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setCredentials(prev => ({ ...prev, [id]: value }));
+    if (error) setError(null);
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!credentials.email || !credentials.password) {
+      setError("Email and password are required");
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response: ApiResponse<SigninResponseData> = await signinUser(credentials);
+      
+      if (response.code === 200 && response.data) {
+        localStorage.setItem("authToken", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        alert("Login successful");
+        router.push("/dashboard/homepage");
+      } else {
+        setError(response.error || response.message || "Invalid email or password");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen p-10 bg-white dark:bg-black">
@@ -29,7 +100,7 @@ export default function SignIn() {
           </CardDescription>
         </CardHeader>
         <CardContent className="">
-          <form>
+          <form onSubmit={handleSubmit}>
             <div className="grid gap-3">
               <div className="space-y-1">
                 <label htmlFor="email" className="text-sm font-bold dark:text-gray-300">
@@ -39,7 +110,7 @@ export default function SignIn() {
                   <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
                   </div>
-                  <Input id="email" type="email" className="pl-10 dark:border-gray-700 dark:bg-gray-800 dark:text-white" />
+                  <Input id="email" type="email" value={credentials.email} onChange={handleChange} className="pl-10 dark:border-gray-700 dark:bg-gray-800 dark:text-white" />
                 </div>
               </div>
               
@@ -59,6 +130,9 @@ export default function SignIn() {
                   <Input 
                     id="password" 
                     type={showPassword ? "text" : "password"} 
+                    value={credentials.password}
+                    onChange={handleChange}
+                    placeholder="Enter your password"
                     className="pl-10 pr-10 dark:border-gray-700 dark:bg-gray-800 dark:text-white" 
                   />
                   <button
@@ -75,8 +149,13 @@ export default function SignIn() {
                 </div>
               </div>
               
-              <Button type="submit" className="w-full bg-black text-white hover:bg-gray-800 hover:cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-700">
-                Log in
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 text-sm dark:bg-red-900/30 dark:border-red-900 dark:text-red-400">
+                  {error}
+                </div>
+              )}
+              <Button type="submit" disabled={isLoading} className="w-full bg-black text-white hover:bg-gray-800 hover:cursor-pointer dark:bg-gray-800 dark:hover:bg-gray-700">
+                  {isLoading ? "Logging in..." : "Log in"}
               </Button>
             </div>
           </form>

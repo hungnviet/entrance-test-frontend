@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,9 +17,69 @@ import { Separator } from "@/components/ui/separator";
 
 import { HomeButton } from "@/components/page/HomeButton";
 
+import { signupUser } from "@/lib/api/auth"; 
+import { ApiResponse } from "@/types/dashboard"; 
 
 export default function SignUp() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: ""
+  });
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+    setError(null); 
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Basic form validation
+    if (!formData.name || !formData.email || !formData.password) {
+      setError("All fields are required");
+      return;
+    }
+    
+    // Password validation
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return;
+    }
+    
+    if (!/[A-Z]/.test(formData.password) || 
+        !/[a-z]/.test(formData.password) || 
+        !/[0-9]/.test(formData.password)) {
+      setError("Password must include uppercase, lowercase, and numbers");
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response: ApiResponse = await signupUser(formData);
+      
+      if (response.code === 201) {
+        // Successful signup
+        alert("Account created successfully!"); 
+        router.push("/auth/signin"); 
+      } else {
+        setError(response.error || response.message || "Failed to create account");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred");
+      console.error(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center justify-start min-h-screen p-10 bg-white dark:bg-black">
@@ -34,7 +95,13 @@ export default function SignUp() {
           </CardDescription>
         </CardHeader>
         <CardContent className="py-2">
-          <form>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 text-sm dark:bg-red-900/30 dark:border-red-900 dark:text-red-400">
+              {error}
+            </div>
+          )}
+        
+          <form onSubmit={handleSubmit}>
             <div className="grid gap-3">
               <div className="space-y-1">
                 <label htmlFor="name" className="text-sm font-bold dark:text-gray-300">
@@ -42,7 +109,9 @@ export default function SignUp() {
                 </label>
                 <Input 
                   id="name" 
-                  type="text" 
+                  type="text"
+                  value={formData.name}
+                  onChange={handleChange}
                   className="focus-visible:bg-transparent focus-visible:ring-0 focus-visible:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white" 
                 />
               </div>
@@ -57,7 +126,9 @@ export default function SignUp() {
                   </div>
                   <Input 
                     id="email" 
-                    type="email" 
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
                     className="pl-10 focus-visible:bg-transparent focus-visible:ring-0 focus-visible:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white" 
                   />
                 </div>
@@ -73,7 +144,9 @@ export default function SignUp() {
                   </div>
                   <Input 
                     id="password" 
-                    type={showPassword ? "text" : "password"} 
+                    type={showPassword ? "text" : "password"}
+                    value={formData.password}
+                    onChange={handleChange} 
                     className="pl-10 pr-10 focus-visible:bg-transparent focus-visible:ring-0 focus-visible:border-gray-400 dark:border-gray-700 dark:bg-gray-800 dark:text-white" 
                   />
                   <button
@@ -97,8 +170,12 @@ export default function SignUp() {
                 </div>
               </div>
               
-              <Button type="submit" className="w-full bg-black text-white hover:bg-gray-800 mt-2 dark:bg-gray-800 dark:hover:bg-gray-700">
-                Create account
+              <Button 
+                type="submit" 
+                disabled={isLoading}
+                className="w-full bg-black text-white hover:bg-gray-800 mt-2 dark:bg-gray-800 dark:hover:bg-gray-700"
+              >
+                {isLoading ? "Creating account..." : "Create account"}
               </Button>
             </div>
           </form>
